@@ -76,22 +76,19 @@
 		queueSize: 2,//同时上传的文件数
 		preSize: '500', //每次发送的文件块大小，以K为单位，设定后不要修改，否则上传文件将出现异常
 		uploadURL: 'uploadFile.php', //上传的路径
-		drop: false, //开启拖拽
-		dropId: '#baseUpfileDrop', //拖拽区域ID
 		inputButton: '#baseUpfileInput', //上传按钮ID
+		drop:true,
+		dropId:'#fileList',
 		onLoadFile: loadFile, //选择文件后触发，这里的files是所有添加过的文件
 		onSameFile: sameFile, //选择文件后触发
 		onUploadError: uploadError, //上传异常 //参照errorCode
 		onLastBlobIndex: lastBlobIndex, //上传最后一个文件时附带数据,例如目录名字
-		onAddFile:creatFileView,
-		onBeforeAddFile:beforeAddFile,
-		onUploading:updatePrecent,
-		drop:true,
-		dropId:'#fileList',
-		uploadURL:'uploadFile.php',
-		onUploadDone:uploadDone,
-		onUploadAllDone:uploadAllDone,
-		onFileStateChange:fileStateChange
+		onAddFile:creatFileView,	//选择文件后触发，如果选择多个文件则会触发多次
+		onBeforeAddFile:beforeAddFile,	//文件过滤,可以使用,如果将file的enable设置为false，则不会添加到文件列表，不会触发addFile
+		onUploading:updatePrecent,	//上传中,主要动态刷新上传进度
+		onUploadDone:uploadDone,	//文件上传完成
+		onUploadAllDone:uploadAllDone, //全部有效文件文件上传完成
+		onFileStateChange:fileStateChange	//状态变更时触发 faile,disable,error,stop,wait,uploading,done
 	});
 	
 	

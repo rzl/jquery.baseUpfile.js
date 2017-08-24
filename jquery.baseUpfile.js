@@ -37,7 +37,7 @@ mail	1120082028@qq.com
 			onUploadAllDone: function (state) {}, //文件上传完成
 			onUploadStop: function (file) {}, //停止上传
 			onLastBlockIndex: function (file, formData) {}, //上传最后一个文件时附带数据,例如目录名字
-			onFileStateChange: function (file, state) {}
+			onFileStateChange: function (file, state) {}	//状态变更时触发
 			//faile,disable,error,stop,wait,uploading,done
 		};
 		/*
@@ -122,6 +122,10 @@ mail	1120082028@qq.com
 				file.state = 'stop';
 				file.sendIndex = _this.getFileSendIndexCache(file);
 				file.blockCount = Math.ceil(file.size / this.opt.preSize);
+				if (file.size == 0) {
+					opt.onUploadError(file, '2');
+					file.state = 'faile';
+				}
 				return this;
 			};
 
