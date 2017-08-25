@@ -37,7 +37,8 @@ mail	1120082028@qq.com
 			onUploadAllDone: function (state) {}, //文件上传完成
 			onUploadStop: function (file) {}, //停止上传
 			onLastBlockIndex: function (file, formData) {}, //上传最后一个文件时附带数据,例如目录名字
-			onFileStateChange: function (file, state) {}	//状态变更时触发
+			onFileStateChange: function (file, state) {}
+			//状态变更时触发
 			//faile,disable,error,stop,wait,uploading,done
 		};
 		/*
@@ -160,7 +161,7 @@ mail	1120082028@qq.com
 			BaseUpfile.prototype.uploadFile = function (file) {
 				var _this = this;
 				var opt = _this.opt;
-				if (!file.state || !file.sendIndex || !file.blockCount) {
+				if (!file.state || (file.sendIndex == undefined) || !file.blockCount) {
 					console.log('文件未被初始化，不能上传');
 					opt.onUploadError(file, '0');
 				}
