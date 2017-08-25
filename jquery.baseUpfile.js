@@ -162,9 +162,11 @@ mail	1120082028@qq.com
 				var opt = _this.opt;
 				if (!file.state || !file.sendIndex || !file.blockCount) {
 					console.log('文件未被初始化，不能上传');
+					_this.setFileState(file, 'error');
 					opt.onUploadError(file, '0');
 				}
 				if (file.size == 0) {
+					_this.setFileState(file, 'error');
 					opt.onUploadError(file, '2');
 					return;
 				}
@@ -214,7 +216,7 @@ mail	1120082028@qq.com
 							file.sendIndex = parseInt(file.sendIndex) + 1;
 							_this.setFileSendIndexCache(file);
 						} else {
-							_this.setFileState(file, 'stop');
+							_this.setFileState(file, 'error');
 							_this.opt.onUploadError(file, '4', result);
 						}
 						if (file.state == 'stop') {
@@ -224,7 +226,7 @@ mail	1120082028@qq.com
 						_this.uploadFile(file);
 					},
 					error: function (e) {
-						_this.setFileState(file, 'stop');
+						_this.setFileState(file, 'error');
 						_this.opt.onUploadError(file, '3', e);
 					}
 				})
