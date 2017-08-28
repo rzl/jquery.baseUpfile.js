@@ -121,6 +121,7 @@ mail	1120082028@qq.com
 				}
 				file.fileType = file.fileType ? file.fileType : file.type;
 				file.state = 'stop';
+				file.lock = false;
 				file.sendIndex = _this.getFileSendIndexCache(file);
 				file.blockCount = Math.ceil(file.size / this.opt.preSize);
 				if (file.size == 0) {
@@ -159,32 +160,36 @@ mail	1120082028@qq.com
 			上传函数，一般不直接使用，需要经过初始化
 			 */
 			BaseUpfile.prototype.uploadFile = function (file) {
+				if (file.lock) {
+					return;
+				}
+				file.lock = true;
 				var _this = this;
 				var opt = _this.opt;
 				if (!file.state || (file.sendIndex == undefined) || !file.blockCount) {
 					console.log('文件未被初始化，不能上传');
-					_this.setFileState(file, 'error');
+					file.lock = false;
 					opt.onUploadError(file, '0');
 				}
 				if (file.size == 0) {
-					_this.setFileState(file, 'error');
+					file.lock = false;
 					opt.onUploadError(file, '2');
 					return;
 				}
 				switch (file.state) {
 				case 'disable':
+					file.lock = false;
 					opt.onUploadError(file, '1');
 					return;
 					break;
-				case 'stop':
-					return;
-					break;
 				}
+
 				file.sendIndex = parseInt(this.getFileSendIndexCache(file));
 				if (file.blockCount <= file.sendIndex) {
 					opt.onUploading(file);
 					this.setFileState(file, 'done');
 					opt.onUploadDone(file);
+					file.lock = false;
 					var state = this.state();
 					if (state.doneCount == state.enableCount) {
 						opt.onUploadAllDone(state);
@@ -217,9 +222,11 @@ mail	1120082028@qq.com
 							file.sendIndex = parseInt(file.sendIndex) + 1;
 							_this.setFileSendIndexCache(file);
 						} else {
-							_this.setFileState(file, 'error');
+							console.log('error');
+							_this.setFileState(file, 'stop');
 							_this.opt.onUploadError(file, '4', result);
 						}
+						file.lock = false;
 						if (file.state == 'stop') {
 							_this.opt.onUploadStop(file);
 							return;
@@ -227,7 +234,8 @@ mail	1120082028@qq.com
 						_this.uploadFile(file);
 					},
 					error: function (e) {
-						_this.setFileState(file, 'error');
+						file.lock = false;
+						_this.setFileState(file, 'stop');
 						_this.opt.onUploadError(file, '3', e);
 					}
 				})
@@ -315,7 +323,23 @@ mail	1120082028@qq.com
 				file.state = state;
 				this.queueNext();
 				this.opt.onFileStateChange(file, state);
-			}
+			};
+			BaseUpfile.prototype.startAll = function () {
+				for (var a = 0; a < this.files.length; a++) {
+					var file = this.files[a];
+					if (file.state == 'stop' || file.state == 'wait') {
+						this.startUploadFile(file);
+					}
+				}
+			};
+			BaseUpfile.prototype.stopAll = function () {
+				for (var a = 0; a < this.files.length; a++) {
+					var file = this.files[a];
+					if (file.state == 'uploading' || file.state == 'wait') {
+						this.setFileState(file, 'stop');
+					}
+				}
+			};
 			BaseUpfile.prototype.state = function () {
 				var total = this.files.length;
 				var disableCount = 0;

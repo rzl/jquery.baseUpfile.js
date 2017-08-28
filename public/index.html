@@ -9,9 +9,9 @@
 <td>文件类型</td>
 <td>文件大小</td>
 <td>上传进度</td>
-<td><button onclick="$('.uploadButton').click();">全部上传</button></td>
-<td><button onclick="$('.stopButton').click();">全部暂停</button></td>
-<td><button onclick="$('.continueButton').click();">全部续传</button></td>
+<td><button onclick="up.startAll();">全部上传</button></td>
+<td><button onclick="up.stopAll();">全部暂停</button></td>
+<td><button onclick="up.startAll();">全部续传</button></td>
 		
 </tr>
 </table>
@@ -39,7 +39,7 @@
 		$("#p_"+file.fileIndex).text(Math.ceil(file.sendIndex/file.blockCount*100)+'%');
 	}
 	var uploadDone=function(file){
-		$("#p_"+file.fileIndex).text('完成');
+		//$("#p_"+file.fileIndex).text('完成');
 		var state=up.state();
 		$("#state").text('总文件:'+state.total+' 有效文件:'+state.enableCount+' 无效文件:'+state.disableCount+' 完成:'+state.doneCount+' 当前上传任务数:'+state.uploadingCount+' 停止任务数:'+state.stopCount+' 队列任务数:'+state.waitCount);
 	}
@@ -47,7 +47,7 @@
 		$("#state").text($("#state").text()+'全部上传完成');
 	}
 	var fileStateChange=function(file,state){
-		$("#p_"+file.fileIndex).text(state);
+		//$("#p_"+file.fileIndex).text(state);
 
 	}
 	var beforeAddFile=function(file){
@@ -103,7 +103,7 @@
 		up.setAccept('image/png,image/gif,image,jpgimage/jepg');
 	});
 	$("#clearCache").click(function(){
-		up.clearAllFileSendIndexCache();
+		up.resetFiles();
 	});
 
 </script>
